@@ -13,6 +13,7 @@ import (
 var (
 	hostKey        ssh.PublicKey
 	defaultKeyPath = path.Join(userHome(), ".ssh/id_rsa")
+	defaultPort    = "22"
 )
 
 // ScpOptions ID
@@ -82,6 +83,10 @@ func Scp(op ScpOptions) error {
 			// HostKeyCallback: ssh.FixedHostKey(hostKey),
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		}
+	}
+
+	if op.Port == "" {
+		op.Port = defaultPort
 	}
 
 	client, err := ssh.Dial("tcp", op.Hostname+":"+op.Port, config)
