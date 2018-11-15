@@ -24,9 +24,17 @@ function RadioOnClickHandler() {
 		ipc.on('restoreForm', (evt, data) => {
 			console.log(data);
 			let form = document.getElementById('form');
-			form['hostname'].value = data.hostname | "";
-			form['privKeyPath'].value = data.privKeyPath | "";
-			form['checkbox'].checked = data.saveValue | "";
+			if (data.hostname != undefined)
+				form['hostname'].value = data.hostname;
+			form['privKeyPath'].value = data.privKeyPath;
+			if (data.username != undefined)
+				form['username'].value = data.username;
+			if (data.src != undefined)
+				form['src'].value = data.src;
+			if (data.dest != undefined)
+				form['dest'].value = data.dest;
+
+			form['checkbox'].checked = data.saveValue;
 		})
     // Loop over them and prevent submission
     var validation = Array.prototype.filter.call(forms, function(form) {
@@ -50,7 +58,7 @@ function formSubmit(){
 		privKeyPath: form['privKeyPath'].value,
 		password: form['password'].value,
 		src: form['src'].value,
-		dst: form['dest'].value,
+		dest: form['dest'].value,
 		saveValue: form['checkbox'].checked
 	}
 	console.log(formData);
