@@ -1,9 +1,10 @@
 package main
 
-import (
-	scp "github.com/APwhitehat/goscp/scp"
-)
+import "github.com/APwhitehat/goscp"
 
 func main() {
-	var scpOp scp.ScpOptions
+	var scpOp goscp.ScpOptions
+
+	scpOp.Hostname = "hello"
+	goscp.Scp(scpOp, "src", "desc")
 }

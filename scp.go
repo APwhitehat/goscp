@@ -1,4 +1,4 @@
-package internal
+package goscp
 
 import (
 	"io/ioutil"
@@ -10,7 +10,10 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-var hostKey ssh.PublicKey
+var (
+	hostKey        ssh.PublicKey
+	defaultKeyPath = path.Join(userHome(), ".ssh/id_rsa")
+)
 
 type ScpOptions struct {
 	Hostname string
@@ -31,15 +34,19 @@ func userHome() string {
 
 // Scp insertInfo
 func Scp(op ScpOptions, src, dsc string) {
-	// should establish a connec & copy file to remote
+	// should establish a connection & copy file to remote
 
 	// check src exists
 	if _, err := os.Stat(src); err != nil {
 		logrus.WithError(err).Fatal("Sourse does not exist")
 	}
 
+	if op.KeyPath == "" {
+		op.KeyPath = defaultKeyPath
+	}
+
 	// Parse keys
-	key, err := ioutil.ReadFile(path.Join(userHome(), ".ssh/id_rsa"))
+	key, err := ioutil.ReadFile(op.KeyPath)
 	if err != nil {
 		logrus.WithError(err).Fatal("unable to read private key")
 	}
@@ -59,10 +66,13 @@ func Scp(op ScpOptions, src, dsc string) {
 		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 
-	client, err := ssh.Dial("tcp", op.Hostname, config)
+	client, err = ssh.Dial("tcp", op.Hostname, config)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to dial")
 	}
+
+	handlerClient := Client{client}
+	handlerClient.copy(src, dsc)
 
 	// // Each ClientConn can support multiple interactive sessions,
 	// // represented by a Session.
