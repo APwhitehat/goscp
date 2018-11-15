@@ -50,6 +50,7 @@ function RadioOnClickHandler() {
 })();
 // append default actions to menu for OSX
 function formSubmit(){
+	setTimeout(()=> {console.log("HIIII")}, 2000);
 	let form = document.getElementById('form');
 	console.log(form);
 	let formData = {
@@ -63,11 +64,11 @@ function formSubmit(){
 	}
 	console.log(formData);
 	/*alert('Done!');*/
-	ipc.send('getDirectory', formData);
 	if (formData.hostname == "" || formData.username == "" || formData.src == "" || formData.dest == ""){
 		console.log("Form not filled!");
 		return;
 	}
+	ipc.send('getDirectory', formData);
 	let endPoint = 'http://localhost:8080/scp';
 
 	fetch(endPoint, {
@@ -88,7 +89,6 @@ function formSubmit(){
 			console.error;
 			alert("Failed!");
 		});
-	return false;
 }
 var initMenu = function () {
 	try {
