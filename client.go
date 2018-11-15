@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
@@ -26,7 +27,7 @@ type Client struct {
 	MaxConnections int
 }
 
-func (c *Client) copy(src, dst string) {
+func (c *Client) copy(src, dst string) error {
 	if c.MaxConnections == 0 {
 		c.MaxConnections = defaultConnections
 	}
@@ -34,18 +35,24 @@ func (c *Client) copy(src, dst string) {
 
 	// limit number of connections
 	sessions := make(chan struct{}, c.MaxConnections)
+	var wg sync.WaitGroup
 
-	c.recursiveCopy(sessions, src, dst)
+	wg.Add(1)
+	c.recursiveCopy(wg, sessions, src, dst)
+	wg.Wait()
+
+	return nil
 }
 
-func (c *Client) recursiveCopy(sessions chan struct{}, src, dst string) {
+func (c *Client) recursiveCopy(wg sync.WaitGroup, sessions chan struct{}, src, dst string) {
+	defer wg.Done()
+
 	srcinfo, err := os.Stat(src)
 	if err != nil {
 		logrus.WithError(err).Fatal("file/folder not found")
 	}
 	// get permission for a session otherwise wait.
 	sessions <- struct{}{}
-	logrus.Info("copying ", src, " to ", dst)
 	if srcinfo.IsDir() {
 		dst = path.Join(dst, srcinfo.Name())
 		if err = c.makeDir(dst); err != nil {
@@ -63,10 +70,13 @@ func (c *Client) recursiveCopy(sessions chan struct{}, src, dst string) {
 		for _, fd := range fds {
 			srcfp := path.Join(src, fd.Name())
 			dstfp := path.Join(dst, fd.Name())
-			go c.recursiveCopy(sessions, srcfp, dstfp)
+			wg.Add(1)
+			go c.recursiveCopy(wg, sessions, srcfp, dstfp)
 		}
 	} else {
+		logrus.Info("copying ", src, " to ", dst)
 		c.pushFile(src, dst)
+		logrus.Info("done copying ", src, " to ", dst)
 		// release a session
 		<-sessions
 	}
