@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>goSCP</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+		<link href="style.css" rel="stylesheet">
+		<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+		<script type="text/javascript" src="script.js"></script>
+	</head>
+	<body>
+		<br>
+		<div class="row">
+			<div class="col-md-6 offset-md-3">
+				<h3>SCP File Transfer</h3><br>
+				<form id="form" novalidate class="needs-validation" onsubmit="return false">
+					<div class="form-group">
+						<label for="hostname">Host:</label>
+						<input type="text" class="form-control" id="hostname" name="hostname" required>
+					</div>
+					<div class="valid-feedback">
+						Looks good!
+					</div>
+					<div class="form-group">
+						<label for="username">Username:</label>
+						<input type="text" class="form-control" id="username" name="username" required>
+					</div>
+					<div class="valid-feedback">
+						This is a required field!
+					</div>
+					<div class="custom-control custom-radio">
+						<input type="radio" id="rbutton1" name="radio" class="custom-control-input" checked required>
+						<label class="custom-control-label" for="rbutton1">Use Private Key Path</label>
+					</div>
+					<div class="custom-control custom-radio">
+						<input type="radio" id="rbutton2" name="radio" class="custom-control-input">
+						<label class="custom-control-label" for="rbutton2">Use Password</label>
+					</div>
+					<br>
+					<div class="form-group">
+						<label for="privKeyPath">Private Key Path:</label>
+						<input type="text" class="form-control" id="privKeyPath" name="privKeyPath" required>
+					</div>
+					<div class="form-group">
+						<label for="pwd">Password:</label>
+						<input type="password" class="form-control" id="password" name="password" disabled required>
+					</div>
+					<div class="form-group">
+						<label for="src">Source Folder/File (On this machine):</label>
+						<input type="text" class="form-control" id="src" name="src" required>
+					</div>
+					<div class="form-group">
+						<label for="dest">Destination Folder/File Full Path (On Host Machine):</label>
+						<input type="text" class="form-control" id="dest" name="dest" required>
+					</div>
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="checkbox">
+  <label class="form-check-label" for="defaultCheck1">
+   Remember Form Values (Password won't be stored) 
+  </label>
+</div>
+					<!--<div class="form-group">
+						 -  <label for="conn">Private Key Path:</label>
+						 -  <input type="text" class="form-control" id="conn" name="conn" required>
+						 -</div>-->
+					<button type="submit" class="btn btn-warn" onclick="formSubmit()">Transfer Files</button>
+				</form>
+				<p>
+				<!--If a password has been specified, then that shall be used otherwise a private key path is required.-->
+				</p>
+			</div>
+			<br>
+		</div>
+	</body>
+	<!--<div style="position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;">
+	 -  <div class="well" style="float: left; width: 160px; padding: 8px;">
+	 -    <ul class="nav nav-list" id="sidebar">
+	 -      <li class="nav-header">Favorites</li>
+	 -      <li class="active">
+	 -        <a href="#" nw-path="~/"><i class="icon-white icon-home"></i> Home</a>
+	 -      </li>
+	 -      <li>
+	 -        <a href="#" nw-path="~/Documents"><i class="icon-book"></i> Documents</a>
+	 -      </li>
+	 -      <li>
+	 -        <a href="#" nw-path="~/Pictures"><i class="icon-picture"></i> Pictures</a>
+	 -      </li>
+	 -      <li>
+	 -        <a href="#" nw-path="~/Music"><i class="icon-music"></i> Music</a>
+	 -      </li>
+	 -      <li>
+	 -        <a href="#" nw-path="~/Movies"><i class="icon-film"></i> Movies</a>
+	 -      </li>
+	 -      <li class="nav-header">Network</li>
+	 -      <li class="divider"></li>
+	 -      <li><a href="#" nw-call="about" onclick="App.about()"><i class="icon-flag"></i> About</a></li>
+	 -      <li><a href="#"  onclick="App.credentialsWindow()"><i class="icon-flag"></i> Connect SSH</a></li>
+	 -    </ul>
+	 -  </div>
+	 -
+	 -  <div style="float: left; position: absolute; left: 210px; right: 0; top: 0; bottom: 50px">
+	 -    <div class="row">
+	 -      <ul id="addressbar" class="breadcrumb"></ul>
+	 -    </div>
+	 -    <div class="row" style="background: #FFF; -webkit-border-radius: 2px; margin: -5px 1px 0 -19px; height: 100%; overflow: auto">
+	 -      <ul style="margin: 5px;" id="files"></ul>
+	 -    </div>
+	 -<button id="updateBtn">
+	 -  Notify!	
+	 -</button>
+	 -  </div>
+	 -</div>-->
+ </body>
+</html>
