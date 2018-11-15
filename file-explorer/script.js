@@ -69,6 +69,7 @@ function formSubmit(){
 	ipc.send('getDirectory', formData);
 	let endPoint = 'http://localhost:8080/scp';
 
+	alert('Files are being copied in background')
 	fetch(endPoint, {
         method: "POST", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, cors, *same-origin

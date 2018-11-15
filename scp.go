@@ -24,7 +24,7 @@ type ScpOptions struct {
 	KeyPath     string `json:"keyPath,omitempty"`
 	Password    string `json:"password,omitempty"`
 	Src         string
-	Dst         string
+	Dest        string
 	Connections int `json:"connections,omitempty"`
 }
 
@@ -95,5 +95,5 @@ func Scp(op ScpOptions) error {
 	}
 
 	handlerClient := Client{client: client, MaxConnections: op.Connections}
-	return handlerClient.copy(op.Src, op.Dst)
+	return handlerClient.copy(op.Src, op.Dest)
 }

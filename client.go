@@ -28,7 +28,7 @@ type Client struct {
 }
 
 func (c *Client) copy(src, dst string) error {
-	if c.MaxConnections == 0 {
+	if c.MaxConnections < 1 {
 		c.MaxConnections = defaultConnections
 	}
 	logrus.Info("performing copy with ", c.MaxConnections, " connections")
