@@ -15,12 +15,16 @@ var (
 	defaultKeyPath = path.Join(userHome(), ".ssh/id_rsa")
 )
 
+// ScpOptions ID
 type ScpOptions struct {
-	Hostname string
-	Port     int
-	Username string
-	KeyPath  string
-	Password string
+	Hostname    string
+	Port        string `json:"port,omitempty"`
+	Username    string
+	KeyPath     string `json:"keyPath,omitempty"`
+	Password    string `json:"password,omitempty"`
+	Src         string
+	Dst         string
+	Connections int `json:"connections,omitempty"`
 }
 
 func userHome() string {
@@ -32,62 +36,59 @@ func userHome() string {
 	return usr.HomeDir
 }
 
-// Scp insertInfo
-func Scp(op ScpOptions, src, dsc string) {
+// Scp ID
+func Scp(op ScpOptions) {
 	// should establish a connection & copy file to remote
 
 	// check src exists
-	if _, err := os.Stat(src); err != nil {
-		logrus.WithError(err).Fatal("Sourse does not exist")
+	if _, err := os.Stat(op.Src); err != nil {
+		logrus.WithError(err).Fatal("source does not exist")
 	}
 
-	if op.KeyPath == "" {
-		op.KeyPath = defaultKeyPath
+	var config *ssh.ClientConfig
+	if op.Password != "" {
+		config = &ssh.ClientConfig{
+			User: op.Username,
+			Auth: []ssh.AuthMethod{
+				// Use the password for remote authentication.
+				ssh.Password(op.Password),
+			},
+			// HostKeyCallback: ssh.FixedHostKey(hostKey),
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
+	} else {
+		if op.KeyPath == "" {
+			op.KeyPath = defaultKeyPath
+		}
+
+		// Parse keys
+		key, err := ioutil.ReadFile(op.KeyPath)
+		if err != nil {
+			logrus.WithError(err).Fatal("unable to read private key")
+		}
+
+		// Create the Signer for this private key.
+		signer, err := ssh.ParsePrivateKey(key)
+		if err != nil {
+			logrus.WithError(err).Fatal("unable to parse private key")
+		}
+
+		config = &ssh.ClientConfig{
+			User: op.Username,
+			Auth: []ssh.AuthMethod{
+				// Use the PublicKeys method for remote authentication.
+				ssh.PublicKeys(signer),
+			},
+			// HostKeyCallback: ssh.FixedHostKey(hostKey),
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
 	}
 
-	// Parse keys
-	key, err := ioutil.ReadFile(op.KeyPath)
-	if err != nil {
-		logrus.WithError(err).Fatal("unable to read private key")
-	}
-
-	// Create the Signer for this private key.
-	signer, err := ssh.ParsePrivateKey(key)
-	if err != nil {
-		logrus.WithError(err).Fatal("unable to parse private key")
-	}
-
-	config := &ssh.ClientConfig{
-		User: op.Username,
-		Auth: []ssh.AuthMethod{
-			// Use the PublicKeys method for remote authentication.
-			ssh.PublicKeys(signer),
-		},
-		HostKeyCallback: ssh.FixedHostKey(hostKey),
-	}
-
-	client, err = ssh.Dial("tcp", op.Hostname, config)
+	client, err := ssh.Dial("tcp", op.Hostname+":"+op.Port, config)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to dial")
 	}
 
-	handlerClient := Client{client}
-	handlerClient.copy(src, dsc)
-
-	// // Each ClientConn can support multiple interactive sessions,
-	// // represented by a Session.
-	// session, err := client.NewSession()
-	// if err != nil {
-	//     log.Fatal("Failed to create session: ", err)
-	// }
-	// defer session.Close()
-
-	// // Once a Session is created, you can execute a single command on
-	// // the remote side using the Run method.
-	// var b bytes.Buffer
-	// session.Stdout = &b
-	// if err := session.Run("/usr/bin/whoami"); err != nil {
-	//     log.Fatal("Failed to run: " + err.Error())
-	// }
-	// fmt.Println(b.String())
+	handlerClient := Client{client: client, MaxConnections: op.Connections}
+	handlerClient.copy(op.Src, op.Dst)
 }
