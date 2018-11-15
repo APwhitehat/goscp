@@ -81,9 +81,13 @@ function formSubmit(){
         body: JSON.stringify(formData), // body data type must match "Content-Type" header
 	})
 		.then((val) => {
+			alert("Files are being transferred!");
 			console.log(val);
 		})
-		.catch(console.error);
+		.catch((err) => {
+			console.error;
+			alert("Failed!");
+		});
 	return false;
 }
 var initMenu = function () {
