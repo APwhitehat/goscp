@@ -19,7 +19,11 @@ func ScpHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	logrus.Info(op)
-	Scp(op)
+	err = Scp(op)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(rw).Encode(struct{ Status string }{"Server error"})
+	}
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusOK)

@@ -12,7 +12,7 @@ import (
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	port := flag.String("port", "9880", "Port")
+	port := flag.String("port", "8080", "Port")
 	flag.Parse()
 
 	logrus.Info("starting on port: ", *port)

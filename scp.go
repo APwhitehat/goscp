@@ -37,7 +37,7 @@ func userHome() string {
 }
 
 // Scp ID
-func Scp(op ScpOptions) {
+func Scp(op ScpOptions) error {
 	// should establish a connection & copy file to remote
 
 	// check src exists
@@ -90,5 +90,5 @@ func Scp(op ScpOptions) {
 	}
 
 	handlerClient := Client{client: client, MaxConnections: op.Connections}
-	handlerClient.copy(op.Src, op.Dst)
+	return handlerClient.copy(op.Src, op.Dst)
 }
