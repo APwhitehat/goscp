@@ -4,8 +4,6 @@ const remote  = electron.remote;
 const {Menu, BrowserWindow, MenuItem, shell} = remote;
 const ipc = electron.ipcRenderer;
 
-var abar = require('address_bar');
-var folder_view = require('folder_view');
 
 function RadioOnClickHandler() {
 	let form = document.getElementById('form');
